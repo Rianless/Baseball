@@ -1,43 +1,43 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<head>
   <meta charset="UTF-8"/>
-  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/en/thumb/a/a6/Major_League_Baseball_logo.svg/256px-Major_League_Baseball_logo.svg.png">
-  <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/a/a6/Major_League_Baseball_logo.svg/256px-Major_League_Baseball_logo.svg.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="MLB ⚾">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
   
-  <style>
-    /* ... */
-  </style>
-</head> <body>
-  <div id="root"></div>
-  </body>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="MLB ⚾"/>
-  <meta name="theme-color" content="#0A0E1A"/>
+  <link rel="icon" type="image/png" href="/mlb.png">
+  <link rel="apple-touch-icon" href="/mlb.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="MLB ⚾">
+  <meta name="theme-color" content="#0A0E1A">
+
   <title>MLB 대시보드 ⚾</title>
+  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet"/>
+  
   <style>
+    /* 전체 공통 스타일 */
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#0A0E1A;color:#fff;font-family:"Inter",sans-serif;-webkit-tap-highlight-color:transparent}
+    body{background:#0A0E1A;color:#fff;font-family:"Inter", "Noto Sans KR", sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+    
+    /* 애니메이션 설정 */
     @keyframes fadeIn{from{opacity:0}to{opacity:1}}
     @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
     @keyframes slideDown{from{transform:translateY(0);opacity:1}to{transform:translateY(100%);opacity:0}}
     @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    button{cursor:pointer;-webkit-appearance:none}
+    
+    button{cursor:pointer;-webkit-appearance:none; border:none; outline:none;}
+    
+    /* 스크롤바 숨기기 */
+    ::-webkit-scrollbar { display: none; }
   </style>
 </head>
 <body>
 <div id="root"></div>
+
 <script type="text/babel">
 const {useState, useEffect, useRef} = React;
 
@@ -101,13 +101,13 @@ function ScoreCard({game, dark, D, onClick}) {
             fontSize:"10px",fontWeight:"800",color:"#fff",
             background:"#E31837",borderRadius:"4px",padding:"2px 7px",
           }}>● LIVE</span>}
-          {isFinal && <span style={{fontSize:"10px",fontWeight:"700",color:D.textSub,fontFamily:"Noto Sans KR"}}>FINAL</span>}
+          {isFinal && <span style={{fontSize:"10px",fontWeight:"700",color:D.textSub}}>FINAL</span>}
           {isScheduled && <span style={{fontSize:"11px",fontWeight:"700",color:"#FFB300"}}>{gameTime} KST</span>}
           {isLive && <span style={{fontSize:"11px",color:"#FFB300",fontWeight:"700"}}>
             {game.inningHalf==="Top"?"▲":"▼"}{game.inning}회
           </span>}
         </div>
-        <span style={{fontSize:"10px",color:D.textSub,fontFamily:"Noto Sans KR"}}>{game.venue}</span>
+        <span style={{fontSize:"10px",color:D.textSub}}>{game.venue}</span>
       </div>
 
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -115,7 +115,7 @@ function ScoreCard({game, dark, D, onClick}) {
           <span style={{fontSize:"28px"}}>{away.emoji}</span>
           <div>
             <div style={{fontSize:"14px",fontWeight:"800",color:D.text}}>{away.short}</div>
-            <div style={{fontSize:"9px",color:D.textSub,fontFamily:"Noto Sans KR"}}>{game.away.record}</div>
+            <div style={{fontSize:"9px",color:D.textSub}}>{game.away.record}</div>
           </div>
         </div>
 
@@ -136,7 +136,7 @@ function ScoreCard({game, dark, D, onClick}) {
           <span style={{fontSize:"28px"}}>{home.emoji}</span>
           <div style={{textAlign:"right"}}>
             <div style={{fontSize:"14px",fontWeight:"800",color:D.text}}>{home.short}</div>
-            <div style={{fontSize:"9px",color:D.textSub,fontFamily:"Noto Sans KR"}}>{game.home.record}</div>
+            <div style={{fontSize:"9px",color:D.textSub}}>{game.home.record}</div>
           </div>
         </div>
       </div>
@@ -183,29 +183,27 @@ function GameModal({game, dark, D, onClose}) {
             background:dark?"rgba(255,255,255,0.15)":"rgba(0,0,0,0.15)"}}/>
         </div>
 
-        {/* 헤더 */}
         <div style={{padding:"10px 18px 14px",borderBottom:`1px solid ${dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.08)"}`}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"12px"}}>
             <div>
-              <span style={{fontSize:"11px",fontWeight:"700",color:"#FFB300",fontFamily:"Noto Sans KR"}}>
+              <span style={{fontSize:"11px",fontWeight:"700",color:"#FFB300"}}>
                 {gameDate} · {gameTime} KST
               </span>
-              <div style={{fontSize:"10px",color:D.textSub,fontFamily:"Noto Sans KR",marginTop:"2px"}}>📍 {game.venue}</div>
+              <div style={{fontSize:"10px",color:D.textSub,marginTop:"2px"}}>📍 {game.venue}</div>
             </div>
             <button onClick={handleClose} style={{
               background:dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.06)",
-              border:"none",color:dark?"rgba(255,255,255,0.6)":"rgba(0,0,0,0.5)",
+              color:dark?"rgba(255,255,255,0.6)":"rgba(0,0,0,0.5)",
               borderRadius:"50%",width:"28px",height:"28px",fontSize:"16px",
               display:"flex",alignItems:"center",justifyContent:"center"}}>✕</button>
           </div>
 
-          {/* 팀 vs */}
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:"10px",flex:1}}>
               <span style={{fontSize:"40px"}}>{away.emoji}</span>
               <div>
                 <div style={{fontSize:"16px",fontWeight:"900",color:D.text}}>{away.short}</div>
-                <div style={{fontSize:"11px",color:D.textSub,fontFamily:"Noto Sans KR"}}>{game.away.name}</div>
+                <div style={{fontSize:"11px",color:D.textSub}}>{game.away.name}</div>
                 <div style={{fontSize:"10px",color:D.textSub}}>{game.away.record}</div>
               </div>
             </div>
@@ -221,7 +219,7 @@ function GameModal({game, dark, D, onClose}) {
                     {isLive && <div style={{fontSize:"11px",color:"#FFB300",fontWeight:"700",textAlign:"center"}}>
                       {game.inningHalf==="Top"?"▲":"▼"}{game.inning}회
                     </div>}
-                    {isFinal && <div style={{fontSize:"10px",color:D.textSub,fontFamily:"Noto Sans KR",textAlign:"center"}}>FINAL</div>}
+                    {isFinal && <div style={{fontSize:"10px",color:D.textSub,textAlign:"center"}}>FINAL</div>}
                   </div>
               }
             </div>
@@ -229,25 +227,24 @@ function GameModal({game, dark, D, onClose}) {
               <span style={{fontSize:"40px"}}>{home.emoji}</span>
               <div style={{textAlign:"right"}}>
                 <div style={{fontSize:"16px",fontWeight:"900",color:D.text}}>{home.short}</div>
-                <div style={{fontSize:"11px",color:D.textSub,fontFamily:"Noto Sans KR"}}>{game.home.name}</div>
+                <div style={{fontSize:"11px",color:D.textSub}}>{game.home.name}</div>
                 <div style={{fontSize:"10px",color:D.textSub}}>{game.home.record}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* 이닝 스코어 */}
         <div style={{padding:"18px 18px 0"}}>
           <div style={{marginBottom:"18px"}}>
             <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"10px"}}>
               <span style={{fontSize:"15px"}}>📊</span>
-              <span style={{fontSize:"13px",fontWeight:"800",fontFamily:"Noto Sans KR"}}>이닝별 스코어</span>
+              <span style={{fontSize:"13px",fontWeight:"800"}}>이닝별 스코어</span>
             </div>
             <div style={{background:dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)",
               border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)"}`,
               borderRadius:"12px",padding:"4px"}}>
               {isScheduled
-                ? <div style={{textAlign:"center",padding:"16px",color:D.textSub,fontSize:"12px",fontFamily:"Noto Sans KR"}}>
+                ? <div style={{textAlign:"center",padding:"16px",color:D.textSub,fontSize:"12px"}}>
                     경기 예정 · 경기 후 스코어가 표시됩니다
                   </div>
                 : <div style={{overflowX:"auto"}}>
@@ -290,19 +287,18 @@ function GameModal({game, dark, D, onClose}) {
             </div>
           </div>
 
-          {/* 선발 투수 */}
           {(game.away.pitcher || game.home.pitcher) && (
             <div>
               <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"10px"}}>
                 <span style={{fontSize:"15px"}}>⚾</span>
-                <span style={{fontSize:"13px",fontWeight:"800",fontFamily:"Noto Sans KR"}}>선발 투수</span>
+                <span style={{fontSize:"13px",fontWeight:"800"}}>선발 투수</span>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px"}}>
                 {[{t:game.away,info:away},{t:game.home,info:home}].map(({t,info},i)=>(
                   <div key={i} style={{background:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)",
                     border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)"}`,
                     borderRadius:"12px",padding:"12px"}}>
-                    <div style={{fontSize:"10px",color:D.textSub,fontFamily:"Noto Sans KR",marginBottom:"4px"}}>
+                    <div style={{fontSize:"10px",color:D.textSub,marginBottom:"4px"}}>
                       {i===0?"원정":"홈"} · {info.short}
                     </div>
                     <div style={{fontSize:"14px",fontWeight:"800",color:D.text}}>
@@ -355,43 +351,42 @@ function TodayTab({dark, D}) {
     <div style={{animation:"fadeIn 0.4s"}}>
       {selGame && <GameModal game={selGame} dark={dark} D={D} onClose={()=>setSelGame(null)}/>}
 
-      {/* 갱신 상태 */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"14px"}}>
-        <div style={{fontSize:"11px",color:D.textSub,fontFamily:"Noto Sans KR"}}>
+        <div style={{fontSize:"11px",color:D.textSub}}>
           {loading?"불러오는 중...":lastUpdate?`${lastUpdate.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})} 업데이트`:""}
         </div>
         <button onClick={fetchGames} style={{
-          background:"#E31837",border:"none",color:"#fff",
+          background:"#E31837",color:"#fff",
           borderRadius:"8px",padding:"5px 12px",fontSize:"11px",
-          fontFamily:"Noto Sans KR",fontWeight:"700",cursor:"pointer"}}>🔄 새로고침</button>
+          fontWeight:"700"}}>🔄 새로고침</button>
       </div>
 
       {loading && (
         <div style={{textAlign:"center",padding:"60px 0",color:D.textSub}}>
           <div style={{fontSize:"36px",display:"inline-block",animation:"spin 1s linear infinite"}}>⚾</div>
-          <div style={{marginTop:"12px",fontFamily:"Noto Sans KR",fontSize:"13px"}}>경기 정보 불러오는 중...</div>
+          <div style={{marginTop:"12px",fontSize:"13px"}}>경기 정보 불러오는 중...</div>
         </div>
       )}
 
       {error && (
         <div style={{background:"rgba(227,24,55,0.1)",border:"1px solid rgba(227,24,55,0.3)",
-          borderRadius:"12px",padding:"16px",textAlign:"center",color:"#E31837",fontFamily:"Noto Sans KR"}}>
+          borderRadius:"12px",padding:"16px",textAlign:"center",color:"#E31837"}}>
           ❌ {error}
           <br/>
           <button onClick={fetchGames} style={{marginTop:"8px",background:"#E31837",color:"#fff",
-            border:"none",borderRadius:"6px",padding:"4px 12px",cursor:"pointer",fontFamily:"Noto Sans KR"}}>다시 시도</button>
+            borderRadius:"6px",padding:"4px 12px"}}>다시 시도</button>
         </div>
       )}
 
       {!loading && !error && games.length===0 && (
-        <div style={{textAlign:"center",padding:"60px 0",color:D.textSub,fontFamily:"Noto Sans KR"}}>
+        <div style={{textAlign:"center",padding:"60px 0",color:D.textSub}}>
           오늘 예정된 경기가 없어요 😴
         </div>
       )}
 
       {liveGames.length>0 && (
         <div style={{marginBottom:"20px"}}>
-          <div style={{fontSize:"11px",fontWeight:"700",color:"#E31837",letterSpacing:"0.1em",marginBottom:"8px",fontFamily:"Noto Sans KR"}}>
+          <div style={{fontSize:"11px",fontWeight:"700",color:"#E31837",letterSpacing:"0.1em",marginBottom:"8px"}}>
             ● LIVE ({liveGames.length}경기)
           </div>
           {liveGames.map(g=><ScoreCard key={g.id} game={g} dark={dark} D={D} onClick={()=>setSelGame(g)}/>)}
@@ -400,7 +395,7 @@ function TodayTab({dark, D}) {
 
       {scheduledGames.length>0 && (
         <div style={{marginBottom:"20px"}}>
-          <div style={{fontSize:"11px",fontWeight:"700",color:D.textSub,letterSpacing:"0.1em",marginBottom:"8px",fontFamily:"Noto Sans KR"}}>
+          <div style={{fontSize:"11px",fontWeight:"700",color:D.textSub,letterSpacing:"0.1em",marginBottom:"8px"}}>
             예정 ({scheduledGames.length}경기)
           </div>
           {scheduledGames.map(g=><ScoreCard key={g.id} game={g} dark={dark} D={D} onClick={()=>setSelGame(g)}/>)}
@@ -409,7 +404,7 @@ function TodayTab({dark, D}) {
 
       {finalGames.length>0 && (
         <div style={{marginBottom:"20px"}}>
-          <div style={{fontSize:"11px",fontWeight:"700",color:D.textSub,letterSpacing:"0.1em",marginBottom:"8px",fontFamily:"Noto Sans KR"}}>
+          <div style={{fontSize:"11px",fontWeight:"700",color:D.textSub,letterSpacing:"0.1em",marginBottom:"8px"}}>
             종료 ({finalGames.length}경기)
           </div>
           {finalGames.map(g=><ScoreCard key={g.id} game={g} dark={dark} D={D} onClick={()=>setSelGame(g)}/>)}
@@ -452,8 +447,8 @@ function StandingsTab({dark, D}) {
         ))}
       </div>
 
-      {loading && <div style={{textAlign:"center",padding:"40px",color:D.textSub,fontFamily:"Noto Sans KR"}}>로딩 중...</div>}
-      {error && <div style={{color:"#E31837",textAlign:"center",padding:"20px",fontFamily:"Noto Sans KR"}}>❌ {error}</div>}
+      {loading && <div style={{textAlign:"center",padding:"40px",color:D.textSub}}>로딩 중...</div>}
+      {error && <div style={{color:"#E31837",textAlign:"center",padding:"20px"}}>❌ {error}</div>}
 
       {!loading && !error && (
         <div style={{background:D.inputBg,border:`1px solid ${D.cardBorder}`,borderRadius:"14px",overflow:"hidden"}}>
@@ -471,7 +466,7 @@ function StandingsTab({dark, D}) {
               <span style={{fontSize:"12px",fontWeight:"800",color:i===0?"#FFD700":i===1?"#C0C0C0":i===2?"#CD7F32":D.textSub}}>{i+1}</span>
               <div style={{display:"flex",alignItems:"center",gap:"7px"}}>
                 <span style={{fontSize:"18px"}}>{getTeam(row.name).emoji}</span>
-                <span style={{fontSize:"12px",fontWeight:"700",color:D.text,fontFamily:"Noto Sans KR"}}>{getTeam(row.name).short}</span>
+                <span style={{fontSize:"12px",fontWeight:"700",color:D.text}}>{getTeam(row.name).short}</span>
               </div>
               <span style={{textAlign:"center",fontSize:"12px",fontWeight:"700",color:D.text}}>{row.wins}</span>
               <span style={{textAlign:"center",fontSize:"12px",color:D.textSub}}>{row.losses}</span>
@@ -524,15 +519,14 @@ function App() {
 
   return (
     <div style={{minHeight:"100vh",background:D.bg,color:D.text,transition:"background 0.3s,color 0.3s"}}>
-      {/* 헤더 */}
       <div style={{background:dark?"linear-gradient(180deg,#111827 0%,transparent 100%)":"linear-gradient(180deg,#fff 0%,transparent 100%)",padding:"18px 16px 12px",transition:"background 0.3s"}}>
         <div style={{maxWidth:"600px",margin:"0 auto"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div style={{display:"flex",alignItems:"center",gap:"8px"}}>
               <span style={{fontSize:"26px"}}>⚾</span>
               <div>
-                <h1 style={{fontSize:"19px",fontWeight:"900",color:D.text,fontFamily:"Noto Sans KR"}}>MLB 대시보드</h1>
-                <p style={{fontSize:"10px",fontWeight:"700",color:D.textSub,fontFamily:"Noto Sans KR"}}>실시간 MLB 스코어</p>
+                <h1 style={{fontSize:"19px",fontWeight:"900",color:D.text}}>MLB 대시보드</h1>
+                <p style={{fontSize:"10px",fontWeight:"700",color:D.textSub}}>실시간 MLB 스코어</p>
               </div>
             </div>
             <div style={{textAlign:"right",display:"flex",flexDirection:"column",alignItems:"flex-end",gap:"4px"}}>
@@ -540,37 +534,34 @@ function App() {
                 {time.toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})}
               </div>
               <div style={{display:"flex",alignItems:"center",gap:"6px"}}>
-                <div style={{fontSize:"10px",color:D.textSub,fontFamily:"Noto Sans KR"}}>
+                <div style={{fontSize:"10px",color:D.textSub}}>
                   {time.toLocaleDateString("ko-KR",{month:"long",day:"numeric",weekday:"short"})}
                 </div>
                 <button onClick={()=>setDark(!dark)} style={{
                   background:dark?"rgba(255,255,255,0.1)":"rgba(0,0,0,0.08)",
-                  border:"none",borderRadius:"20px",padding:"3px 8px",fontSize:"13px",cursor:"pointer"
-                }}>{dark?"☀️":"🌙"}</button>
+                  borderRadius:"20px",padding:"3px 8px",fontSize:"13px"}}>{dark?"☀️":"🌙"}</button>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 본문 */}
       <div onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}
         style={{maxWidth:"600px",margin:"0 auto",padding:"14px 16px 70px"}}>
         {tab==="today"    && <TodayTab    dark={dark} D={D}/>}
         {tab==="standings"&& <StandingsTab dark={dark} D={D}/>}
       </div>
 
-      {/* 하단 네비 */}
       <div style={{position:"fixed",bottom:0,left:0,right:0,
         background:D.navBg,borderTop:`1px solid ${D.navBorder}`,
         display:"flex",paddingBottom:"6px",zIndex:50,transition:"background 0.3s"}}>
         {TABS.map(t=>(
           <button key={t.id} onClick={()=>setTab(t.id)} style={{
-            flex:1,padding:"4px 0",background:"transparent",border:"none",
+            flex:1,padding:"4px 0",background:"transparent",
             display:"flex",flexDirection:"column",alignItems:"center",gap:"3px",
             color:tab===t.id?"#E31837":D.navText,transition:"all 0.2s"}}>
             <span style={{fontSize:"18px"}}>{t.id==="today"?"📅":"🏆"}</span>
-            <span style={{fontSize:"9px",fontWeight:tab===t.id?"700":"400",fontFamily:"Noto Sans KR"}}>{t.label}</span>
+            <span style={{fontSize:"9px",fontWeight:tab===t.id?"700":"400"}}>{t.label}</span>
           </button>
         ))}
       </div>
