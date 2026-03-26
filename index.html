@@ -297,6 +297,36 @@ function GameModal({game, dark, D, onClose}) {
               }
             </div>
           </div>
+          {/* 승패 투수 - 종료 경기만 */}
+          {(game.status==="Final"||game.status==="Game Over") && (game.winner||game.loser) && (
+            <div style={{marginBottom:"18px"}}>
+              <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"10px"}}>
+                <span style={{fontSize:"15px"}}>🏆</span>
+                <span style={{fontSize:"13px",fontWeight:"800",fontFamily:"'Noto Sans KR',sans-serif"}}>경기 결과</span>
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"8px"}}>
+                {game.winner && (
+                  <div style={{background:dark?"rgba(0,200,100,0.08)":"rgba(0,200,100,0.06)",border:"1px solid rgba(0,200,100,0.2)",borderRadius:"12px",padding:"12px"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:"5px",marginBottom:"5px"}}>
+                      <span style={{fontSize:"9px",background:"rgba(0,200,100,0.2)",color:"#00C864",borderRadius:"4px",padding:"1px 6px",fontWeight:"800"}}>승</span>
+                      <span style={{fontSize:"10px",color:"#00C864",fontWeight:"700"}}>승리투수</span>
+                    </div>
+                    <div style={{fontSize:"14px",fontWeight:"800",color:D.text}}>{game.winner}</div>
+                  </div>
+                )}
+                {game.loser && (
+                  <div style={{background:dark?"rgba(255,50,50,0.08)":"rgba(255,50,50,0.06)",border:"1px solid rgba(255,50,50,0.2)",borderRadius:"12px",padding:"12px"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:"5px",marginBottom:"5px"}}>
+                      <span style={{fontSize:"9px",background:"rgba(255,50,50,0.2)",color:"#FF4444",borderRadius:"4px",padding:"1px 6px",fontWeight:"800"}}>패</span>
+                      <span style={{fontSize:"10px",color:"#FF4444",fontWeight:"700"}}>패전투수</span>
+                    </div>
+                    <div style={{fontSize:"14px",fontWeight:"800",color:D.text}}>{game.loser}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {(game.away.pitcher || game.home.pitcher) && (
             <div>
               <div style={{display:"flex",alignItems:"center",gap:"6px",marginBottom:"10px"}}>
