@@ -1,7 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/kbo", "destination": "/kbo/index.html" },
-    { "source": "/mlb", "destination": "/mlb/index.html" },
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ]
-}
