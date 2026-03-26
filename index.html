@@ -187,6 +187,24 @@ function GameModal({game, dark, D, onClose}) {
   const [lineupTab, setLineupTab] = useState("away");
   const away = getTeam(game.away.name);
   const home = getTeam(game.home.name);
+  const touchStartY = useRef(null);
+
+  // 뒤로가기 시 모달만 닫기
+  useEffect(()=>{
+    history.pushState({modal:true}, "");
+    const onPop = () => handleClose();
+    window.addEventListener("popstate", onPop);
+    return ()=>window.removeEventListener("popstate", onPop);
+  },[]);
+
+  // 스와이프 다운으로 닫기
+  const onTouchStart = e => { touchStartY.current = e.touches[0].clientY; };
+  const onTouchEnd = e => {
+    if(touchStartY.current === null) return;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    touchStartY.current = null;
+    if(dy > 80) handleClose();
+  };
 
   // 라인업에 투수 추가
   const addPitcher = (players, pitcher) => {
@@ -211,7 +229,9 @@ function GameModal({game, dark, D, onClose}) {
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:100,background:dark?"rgba(0,0,0,0.8)":"rgba(0,0,0,0.4)",backdropFilter:"blur(6px)",display:"flex",alignItems:"flex-end",justifyContent:"center",animation:"fadeIn 0.2s"}} onClick={handleClose}>
-      <div style={{width:"100%",maxWidth:"520px",background:dark?"#0F1525":"#ffffff",border:`1px solid ${dark?"rgba(255,255,255,0.1)":"rgba(0,0,0,0.08)"}`,borderRadius:"22px 22px 0 0",maxHeight:"92vh",overflowY:"auto",animation:closing?"slideDown 0.28s ease forwards":"slideUp 0.3s ease",paddingBottom:"28px"}} onClick={e=>e.stopPropagation()}>
+      <div style={{width:"100%",maxWidth:"520px",background:dark?"#0F1525":"#ffffff",border:`1px solid ${dark?"rgba(255,255,255,0.1)":"rgba(0,0,0,0.08)"}`,borderRadius:"22px 22px 0 0",maxHeight:"92vh",overflowY:"auto",animation:closing?"slideDown 0.28s ease forwards":"slideUp 0.3s ease",paddingBottom:"28px"}} onClick={e=>e.stopPropagation()}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}>
         <div style={{display:"flex",justifyContent:"center",padding:"10px 0 2px"}}>
           <div style={{width:"34px",height:"4px",borderRadius:"2px",background:dark?"rgba(255,255,255,0.15)":"rgba(0,0,0,0.15)"}}/>
         </div>
