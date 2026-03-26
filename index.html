@@ -92,9 +92,9 @@ function ScoreCard({game, dark, D, onClick}) {
           <span style={{fontSize:"11px",fontWeight:"700",color:"#FFB300",fontFamily:"'Noto Sans KR',sans-serif"}}>
             {isScheduled?`${gameTime} KST`:isLive?"LIVE":"종료"}
           </span>
-          {isLive && <span style={{fontSize:"9px",background:"#E31837",color:"#fff",borderRadius:"4px",padding:"1px 6px",fontWeight:"800"}}>● {game.inningHalf==="Top"?"▲":"▼"}{game.inning}회</span>}
+          {isLive && <span style={{fontSize:"9px",background:"#2d3748",color:"#fff",borderRadius:"4px",padding:"1px 6px",fontWeight:"800"}}>● {game.inningHalf==="Top"?"▲":"▼"}{game.inning}회</span>}
           {isFinalCard && <span style={{fontSize:"9px",background:"rgba(255,255,255,0.08)",color:D.textSub,borderRadius:"4px",padding:"1px 6px",fontWeight:"700",fontFamily:"'Noto Sans KR',sans-serif"}}>FINAL</span>}
-          <span style={{fontSize:"9px",fontWeight:"700",color:"#E31837",background:"rgba(227,24,55,0.12)",borderRadius:"4px",padding:"1px 5px"}}>{away.league}</span>
+          <span style={{fontSize:"9px",fontWeight:"700",color:"#2d3748",background:"rgba(45,55,72,0.12)",borderRadius:"4px",padding:"1px 5px"}}>{away.league}</span>
         </div>
         <span style={{fontSize:"10px",color:D.textSub,fontFamily:"'Noto Sans KR',sans-serif"}}>📍{game.venue} ›</span>
       </div>
@@ -187,6 +187,17 @@ function GameModal({game, dark, D, onClose}) {
   const [lineupTab, setLineupTab] = useState("away");
   const away = getTeam(game.away.name);
   const home = getTeam(game.home.name);
+
+  // 라인업에 투수 추가
+  const addPitcher = (players, pitcher) => {
+    if(!pitcher) return players;
+    const hasPitcher = players.some(p => p.p === "P");
+    if(hasPitcher) return players;
+    return [...players, {n:"P", name:pitcher, p:"P"}];
+  };
+  const awayLineup = game.lineup ? addPitcher(game.lineup.away||[], game.away.pitcher) : null;
+  const homeLineup = game.lineup ? addPitcher(game.lineup.home||[], game.home.pitcher) : null;
+  const curLineup = lineupTab==="away" ? (awayLineup||[]) : (homeLineup||[]);
   const isLive = game.status === "In Progress";
   const isFinal = game.status === "Final" || game.status === "Game Over";
   const isScheduled = !isLive && !isFinal;
@@ -325,17 +336,25 @@ function GameModal({game, dark, D, onClose}) {
               )}
             </div>
             {!game.lineup
-              ? <div style={{background:dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)",border:`1px solid ${dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.07)"}`,borderRadius:"14px",padding:"26px 20px",textAlign:"center"}}>
-                  <div style={{fontSize:"24px",marginBottom:"6px"}}>📋</div>
-                  <div style={{fontSize:"13px",color:D.textSub,fontFamily:"'Noto Sans KR',sans-serif"}}>라인업은 경기 시작 전 공개됩니다</div>
+              ? <div style={{background:dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)",border:`1px solid ${dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.07)"}`,borderRadius:"14px",padding:"20px",textAlign:"center"}}>
+                  {(lineupTab==="away"?game.away.pitcher:game.home.pitcher)
+                    ? <div>
+                        <div style={{fontSize:"12px",color:D.textSub,fontFamily:"'Noto Sans KR',sans-serif",marginBottom:"12px"}}>선발 투수</div>
+                        <Diamond players={[{n:"P",name:lineupTab==="away"?game.away.pitcher:game.home.pitcher,p:"P"}]} color={lineupTab==="away"?away.color:home.color} dark={dark}/>
+                      </div>
+                    : <div>
+                        <div style={{fontSize:"24px",marginBottom:"6px"}}>📋</div>
+                        <div style={{fontSize:"13px",color:D.textSub,fontFamily:"'Noto Sans KR',sans-serif"}}>라인업은 경기 시작 전 공개됩니다</div>
+                      </div>
+                  }
                 </div>
               : <div style={{background:dark?"rgba(255,255,255,0.02)":"rgba(0,0,0,0.02)",border:`1px solid ${dark?"rgba(255,255,255,0.07)":"rgba(0,0,0,0.07)"}`,borderRadius:"14px",padding:"12px 10px"}}>
                   <div style={{textAlign:"center",marginBottom:"4px",fontSize:"12px",fontWeight:"700",color:lineupTab==="away"?away.color:home.color}}>
                     {lineupTab==="away"?away.emoji:home.emoji} {lineupTab==="away"?game.away.name:game.home.name}
                   </div>
-                  <Diamond players={lineupTab==="away"?(game.lineup.away||[]):(game.lineup.home||[])} color={lineupTab==="away"?away.color:home.color} dark={dark}/>
+                  <Diamond players={curLineup} color={lineupTab==="away"?away.color:home.color} dark={dark}/>
                   <div style={{marginTop:"10px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px"}}>
-                    {(lineupTab==="away"?(game.lineup.away||[]):(game.lineup.home||[])).map((p,i)=>(
+                    {curLineup.map((p,i)=>(
                       <div key={i} style={{display:"flex",alignItems:"center",gap:"6px",padding:"5px 7px",borderRadius:"7px",background:dark?"rgba(255,255,255,0.03)":"rgba(0,0,0,0.03)",border:`1px solid ${dark?"rgba(255,255,255,0.05)":"rgba(0,0,0,0.05)"}`}}>
                         <span style={{fontSize:"10px",fontWeight:"900",minWidth:"17px",textAlign:"center",
                           color:p.p==="P"?"#fff":(lineupTab==="away"?away.color:home.color),
@@ -418,8 +437,8 @@ function TodayTab({dark, D}) {
             {["ALL","AL","NL"].map(l=>(
               <button key={l} onClick={()=>setLeagueFilter(l)} style={{
                 padding:"5px 14px",
-                background:leagueFilter===l?"#E31837":"transparent",
-                border:`1px solid ${leagueFilter===l?"#E31837":D.cardBorder}`,
+                background:leagueFilter===l?"#2d3748":"transparent",
+                border:`1px solid ${leagueFilter===l?"#2d3748":D.cardBorder}`,
                 color:leagueFilter===l?"#fff":D.text,
                 borderRadius:"20px",fontSize:"12px",fontWeight:"700",
                 fontFamily:"'Noto Sans KR',sans-serif",
@@ -427,7 +446,7 @@ function TodayTab({dark, D}) {
               }}>{l}</button>
             ))}
           </div>
-          <button onClick={fetchGames} style={{background:"#E31837",color:"#fff",borderRadius:"8px",padding:"5px 12px",fontSize:"11px",fontWeight:"700"}}>새로고침</button>
+          <button onClick={fetchGames} style={{background:"#2d3748",color:"#fff",borderRadius:"8px",padding:"5px 12px",fontSize:"11px",fontWeight:"700"}}>새로고침</button>
         </div>
 
         {/* 검색창 */}
@@ -464,9 +483,9 @@ function TodayTab({dark, D}) {
       )}
 
       {error && (
-        <div style={{background:"rgba(227,24,55,0.1)",border:"1px solid rgba(227,24,55,0.3)",borderRadius:"12px",padding:"16px",textAlign:"center",color:"#E31837"}}>
+        <div style={{background:"rgba(45,55,72,0.1)",border:"1px solid rgba(45,55,72,0.3)",borderRadius:"12px",padding:"16px",textAlign:"center",color:"#2d3748"}}>
           ❌ {error}<br/>
-          <button onClick={fetchGames} style={{marginTop:"8px",background:"#E31837",color:"#fff",borderRadius:"6px",padding:"4px 12px"}}>다시 시도</button>
+          <button onClick={fetchGames} style={{marginTop:"8px",background:"#2d3748",color:"#fff",borderRadius:"6px",padding:"4px 12px"}}>다시 시도</button>
         </div>
       )}
 
@@ -478,7 +497,7 @@ function TodayTab({dark, D}) {
 
       {liveGames.length>0 && (
         <div style={{marginBottom:"20px"}}>
-          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"8px"}}><h2 style={{fontSize:"12px",fontWeight:"700",color:"#E31837",letterSpacing:"0.1em",fontFamily:"'Noto Sans KR',sans-serif"}}>● LIVE</h2><span style={{fontSize:"10px",background:"rgba(227,24,55,0.15)",border:"1px solid rgba(227,24,55,0.3)",color:"#E31837",borderRadius:"5px",padding:"1px 6px",fontWeight:"700"}}>{liveGames.length}경기</span></div>
+          <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"8px"}}><h2 style={{fontSize:"12px",fontWeight:"700",color:"#2d3748",letterSpacing:"0.1em",fontFamily:"'Noto Sans KR',sans-serif"}}>● LIVE</h2><span style={{fontSize:"10px",background:"rgba(45,55,72,0.15)",border:"1px solid rgba(45,55,72,0.3)",color:"#2d3748",borderRadius:"5px",padding:"1px 6px",fontWeight:"700"}}>{liveGames.length}경기</span></div>
           {liveGames.map(g=><ScoreCard key={g.id} game={g} dark={dark} D={D} onClick={()=>setSelGame(g)}/>)}
         </div>
       )}
@@ -523,8 +542,8 @@ function StandingsTab({dark, D}) {
       <div style={{display:"flex",gap:"8px",marginBottom:"10px"}}>
         {["AL","NL"].map(l=>(
           <button key={l} onClick={()=>setLeague(l)} style={{
-            padding:"6px 20px",background:league===l?"#E31837":"transparent",
-            border:`1px solid ${league===l?"#E31837":D.cardBorder}`,
+            padding:"6px 20px",background:league===l?"#2d3748":"transparent",
+            border:`1px solid ${league===l?"#2d3748":D.cardBorder}`,
             color:league===l?"#fff":D.text,borderRadius:"20px",fontSize:"13px",fontWeight:"700"}}>
             {l}
           </button>
@@ -545,7 +564,7 @@ function StandingsTab({dark, D}) {
       </div>
 
       {loading && <div style={{textAlign:"center",padding:"40px",color:D.textSub}}>로딩 중...</div>}
-      {error && <div style={{color:"#E31837",textAlign:"center",padding:"20px"}}>❌ {error}</div>}
+      {error && <div style={{color:"#2d3748",textAlign:"center",padding:"20px"}}>❌ {error}</div>}
 
       {!loading && !error && (
         <div style={{background:D.inputBg,border:`1px solid ${D.cardBorder}`,borderRadius:"14px",overflow:"hidden"}}>
@@ -627,7 +646,7 @@ function App() {
               <div>
                 <h1 style={{fontSize:"19px",fontWeight:"900",color:D.text,fontFamily:"'Noto Sans KR',sans-serif"}}>MLB 대시보드</h1>
                 <p style={{fontSize:"10px",fontWeight:"700",fontFamily:"'Noto Sans KR',sans-serif"}}>
-                  <span style={{color:"#E31837"}}>실시간 MLB 스코어</span>
+                  <span style={{color:"#2d3748"}}>실시간 MLB 스코어</span>
                 </p>
               </div>
             </div>
@@ -659,7 +678,7 @@ function App() {
 
       <div style={{position:"fixed",bottom:0,left:0,right:0,background:D.navBg,borderTop:`1px solid ${D.navBorder}`,display:"flex",paddingBottom:"6px",zIndex:50,transition:"background 0.3s"}}>
         {TABS.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:"4px 0",background:"transparent",display:"flex",flexDirection:"column",alignItems:"center",gap:"3px",color:tab===t.id?"#E31837":D.navText,transition:"all 0.2s"}}>
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{flex:1,padding:"4px 0",background:"transparent",display:"flex",flexDirection:"column",alignItems:"center",gap:"3px",color:tab===t.id?"#2d3748":D.navText,transition:"all 0.2s"}}>
             <span style={{fontSize:"18px"}}>{t.id==="today"?"📅":"🏆"}</span>
             <span style={{fontSize:"9px",fontWeight:tab===t.id?"700":"400",fontFamily:"'Noto Sans KR',sans-serif"}}>{t.label}</span>
           </button>
