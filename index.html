@@ -16,10 +16,9 @@
     body{background:#F0F2F5;color:#1A1A1A;font-family:"Inter", "Noto Sans KR", sans-serif;overflow-x:hidden;transition:background 0.3s;}
     @keyframes fadeIn{from{opacity:0;transform:scale(0.98)}to{opacity:1;transform:scale(1)}}
     @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
     button{cursor:pointer;border:none;outline:none;transition:all 0.2s}
     button:active{transform:scale(0.95)}
-    input::placeholder{color:rgba(0,0,0,0.3)}
+    input::placeholder{color:rgba(0,0,0,0.35)}
     ::-webkit-scrollbar { display: none; }
   </style>
 </head>
@@ -29,11 +28,11 @@
 <script type="text/babel">
 const { useState, useEffect } = React;
 
-// 1. 모든 구단 데이터 (NL & AL)
 const TEAMS = {
+  // National League
   "Arizona Diamondbacks": {short:"ARI", emoji:"🐍", color:"#A71930", league:"NL"},
   "Atlanta Braves":        {short:"ATL", emoji:"🪓", color:"#CE1141", league:"NL"},
-  "Chicago Cubs":          {short:"CHC", emoji:"Bear", color:"#0E3386", league:"NL"},
+  "Chicago Cubs":          {short:"CHC", emoji:"🐻", color:"#0E3386", league:"NL"},
   "Cincinnati Reds":       {short:"CIN", emoji:"🔴", color:"#C6011F", league:"NL"},
   "Colorado Rockies":      {short:"COL", emoji:"💜", color:"#333366", league:"NL"},
   "Los Angeles Dodgers":   {short:"LAD", emoji:"💙", color:"#005A9C", league:"NL"},
@@ -46,115 +45,125 @@ const TEAMS = {
   "San Francisco Giants":  {short:"SF",  emoji:"🟠", color:"#FD5A1E", league:"NL"},
   "St. Louis Cardinals":   {short:"STL", emoji:"🐦", color:"#C41E3A", league:"NL"},
   "Washington Nationals":  {short:"WSH", emoji:"🦅", color:"#AB0003", league:"NL"},
-  "Baltimore Orioles":     {short:"BAL", emoji:"🐦", color:"#DF4601", league:"AL"},
-  "Boston Red Sox":        {short:"BOS", emoji:"🔴", color:"#BD3039", league:"AL"},
-  "Chicago White Sox":     {short:"CWS", emoji:"⚫", color:"#27251F", league:"AL"},
-  "Cleveland Guardians":   {short:"CLE", emoji:"🔵", color:"#E31937", league:"AL"},
-  "Detroit Tigers":        {short:"DET", emoji:"🐯", color:"#0C2340", league:"AL"},
-  "Houston Astros":        {short:"HOU", emoji:"⭐", color:"#002D62", league:"AL"},
-  "Kansas City Royals":    {short:"KC",  emoji:"💙", color:"#004687", league:"AL"},
-  "Los Angeles Angels":    {short:"LAA", emoji:"👼", color:"#BA0021", league:"AL"},
-  "Minnesota Twins":       {short:"MIN", emoji:"🔴", color:"#002B5C", league:"AL"},
+  // American League
   "New York Yankees":      {short:"NYY", emoji:"⚾", color:"#003087", league:"AL"},
-  "Oakland Athletics":     {short:"OAK", emoji:"🐘", color:"#003831", league:"AL"},
-  "Seattle Mariners":      {short:"SEA", emoji:"🧭", color:"#0C2C56", league:"AL"},
-  "Tampa Bay Rays":        {short:"TB",  emoji:"💛", color:"#092C5C", league:"AL"},
-  "Texas Rangers":         {short:"TEX", emoji:"🤠", color:"#003278", league:"AL"},
-  "Toronto Blue Jays":     {short:"TOR", emoji:"🐦", color:"#134A8E", league:"AL"},
+  "Toronto Blue Jays":     {short:"TOR", emoji:"🐦", color:"#134A8E", league:"AL"}
 };
 
-// 2. NL 경기를 포함한 샘플 데이터
 const MOCK_GAMES = [
   {id:1, status:"In Progress", startTime: new Date(), venue:"Dodger Stadium", away:{name:"New York Yankees", score:4, record:"10-5"}, home:{name:"Los Angeles Dodgers", score:2, record:"12-3"}, inning:5, inningHalf:"Top", awayInnings:[1,0,2,1,0], homeInnings:[0,1,0,1,null], awayPitcher:"Gerrit Cole", homePitcher:"Shohei Ohtani"},
   {id:2, status:"Final", startTime: new Date(), venue:"Petco Park", away:{name:"Arizona Diamondbacks", score:3, record:"8-7"}, home:{name:"San Diego Padres", score:6, record:"11-4"}, awayInnings:[0,1,0,2,0,0,0,0,0], homeInnings:[2,0,1,0,3,0,0,0,0], awayPitcher:"Zac Gallen", homePitcher:"Yu Darvish"},
-  {id:3, status:"Scheduled", startTime: new Date(Date.now() + 3600000), venue:"Wrigley Field", away:{name:"New York Mets", score:0, record:"7-8"}, home:{name:"Chicago Cubs", score:0, record:"9-6"}, awayPitcher:"Kodai Senga", homePitcher:"Justin Steele"}
+  {id:3, status:"Scheduled", startTime: new Date(Date.now() + 7200000), venue:"Wrigley Field", away:{name:"New York Mets", score:0, record:"7-8"}, home:{name:"Chicago Cubs", score:0, record:"9-6"}, awayPitcher:"Kodai Senga", homePitcher:"Justin Steele"}
 ];
 
-function getTeam(name) {
-  return TEAMS[name] || {short: "MLB", emoji:"⚾", color:"#888"};
-}
+function getTeam(name) { return TEAMS[name] || {short:"MLB", emoji:"⚾", color:"#888"}; }
 
-// 스코어 카드 컴포넌트
-function ScoreCard({game, D, onClick}) {
+function ScoreCard({game, D, dark}) {
   const away = getTeam(game.away.name);
   const home = getTeam(game.home.name);
   const isLive = game.status === "In Progress";
   const isFinal = game.status === "Final";
-  
+  const gameTime = new Date(game.startTime).toLocaleTimeString("ko-KR", { hour:"2-digit", minute:"2-digit" });
+
   return (
-    <div onClick={onClick} style={{background:D.card, border:`1px solid ${D.cardBorder}`, borderRadius:"16px", padding:"16px", marginBottom:"12px", animation:"fadeIn 0.3s", cursor:"pointer"}}>
-      <div style={{display:"flex",justifyContent:"space-between",marginBottom:"12px", fontSize:"11px", color:D.textSub}}>
-        <span>{isLive ? "● LIVE" : isFinal ? "FINAL" : "SCHEDULED"}</span>
-        <span>{game.venue}</span>
+    <div style={{background:D.card, border:`1px solid ${D.cardBorder}`, borderRadius:"20px", padding:"18px", marginBottom:"14px", animation:"fadeIn 0.3s", boxShadow: dark ? "none" : "0 4px 15px rgba(0,0,0,0.05)"}}>
+      <div style={{display:"flex", justifyContent:"space-between", marginBottom:"15px"}}>
+        <div style={{display:"flex", gap:"8px", alignItems:"center"}}>
+          {isLive && <span style={{background:"#E31837", color:"#fff", fontSize:"10px", fontWeight:"900", padding:"3px 8px", borderRadius:"6px"}}>● LIVE</span>}
+          {!isLive && <span style={{color:D.textSub, fontSize:"11px", fontWeight:"700"}}>{isFinal ? "FINAL" : gameTime + " KST"}</span>}
+        </div>
+        <span style={{fontSize:"11px", color:D.textSub}}>{game.venue}</span>
       </div>
-      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-        <div style={{textAlign:"center", flex:1}}>
-          <div style={{fontSize:"30px"}}>{away.emoji}</div>
-          <div style={{fontWeight:"800", color:D.text}}>{away.short}</div>
+
+      <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:"10px"}}>
+        <div style={{flex:1, textAlign:"center"}}>
+          <div style={{fontSize:"38px", marginBottom:"4px"}}>{away.emoji}</div>
+          <div style={{fontWeight:"900", fontSize:"16px", color:D.text}}>{away.short}</div>
+          <div style={{fontSize:"10px", color:D.textSub}}>{game.away.record}</div>
         </div>
-        <div style={{fontSize:"24px", fontWeight:"900", color:D.text}}>
-          {game.status === "Scheduled" ? "VS" : `${game.away.score} : ${game.home.score}`}
+        
+        <div style={{flex:1, textAlign:"center"}}>
+          {game.status === "Scheduled" ? (
+             <span style={{fontSize:"22px", fontWeight:"900", color:D.textSub}}>VS</span>
+          ) : (
+            <div style={{display:"flex", alignItems:"center", gap:"12px", justifyContent:"center"}}>
+              <span style={{fontSize:"32px", fontWeight:"900", color:D.text}}>{game.away.score}</span>
+              <span style={{fontSize:"16px", color:D.textSub}}>:</span>
+              <span style={{fontSize:"32px", fontWeight:"900", color:D.text}}>{game.home.score}</span>
+            </div>
+          )}
         </div>
-        <div style={{textAlign:"center", flex:1}}>
-          <div style={{fontSize:"30px"}}>{home.emoji}</div>
-          <div style={{fontWeight:"800", color:D.text}}>{home.short}</div>
+
+        <div style={{flex:1, textAlign:"center"}}>
+          <div style={{fontSize:"38px", marginBottom:"4px"}}>{home.emoji}</div>
+          <div style={{fontWeight:"900", fontSize:"16px", color:D.text}}>{home.short}</div>
+          <div style={{fontSize:"10px", color:D.textSub}}>{game.home.record}</div>
         </div>
       </div>
+      
+      {/* 이닝 정보 및 투수 (간략히 노출) */}
+      {(isLive || isFinal) && (
+        <div style={{marginTop:"15px", paddingTop:"12px", borderTop:`1px solid ${D.cardBorder}`, display:"flex", justifyContent:"space-between", fontSize:"11px", color:D.textSub}}>
+          <span>P: {game.awayPitcher}</span>
+          <span style={{fontWeight:"800", color:"#FFB300"}}>{isLive ? `Inning ${game.inning}` : "Completed"}</span>
+          <span>P: {game.homePitcher}</span>
+        </div>
+      )}
     </div>
   );
 }
 
 function App() {
-  const [tab, setTab] = useState("today");
-  const [dark, setDark] = useState(false); // 라이트 모드 기본
+  const [dark, setDark] = useState(false);
   const [search, setSearch] = useState("");
 
   const D = dark ? {
-    bg:"#0A0E1A", card:"#161B2C", cardBorder:"rgba(255,255,255,0.05)",
-    text:"#fff", textSub:"rgba(255,255,255,0.5)", inputBg:"rgba(255,255,255,0.05)"
+    bg:"#0A0E1A", card:"#161B2C", cardBorder:"rgba(255,255,255,0.06)",
+    text:"#fff", textSub:"rgba(255,255,255,0.5)", inputBg:"rgba(255,255,255,0.08)"
   } : {
-    bg:"#F0F2F5", card:"#ffffff", cardBorder:"rgba(0,0,0,0.05)",
-    text:"#1A1A1A", textSub:"rgba(0,0,0,0.5)", inputBg:"#E8EBF0"
+    bg:"#F0F2F5", card:"#ffffff", cardBorder:"rgba(0,0,0,0.06)",
+    text:"#1A1A1A", textSub:"rgba(0,0,0,0.5)", inputBg:"#E2E6EF"
   };
 
-  const filteredGames = MOCK_GAMES.filter(g => 
-    g.away.name.toLowerCase().includes(search.toLowerCase()) || 
-    g.home.name.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => { document.body.style.backgroundColor = D.bg; }, [dark, D.bg]);
 
   return (
-    <div style={{minHeight:"100vh", background:D.bg, padding:"20px 16px 100px", transition:"all 0.3s"}}>
-      <header style={{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"20px"}}>
-        <h1 style={{fontSize:"22px", fontWeight:"900", color:D.text}}>MLB 대시보드</h1>
-        <button onClick={()=>setDark(!dark)} style={{fontSize:"20px", background:"none"}}>{dark?"☀️":"🌙"}</button>
+    <div style={{maxWidth:"600px", margin:"0 auto", padding:"20px 16px 100px"}}>
+      <header style={{display:"flex", justifyContent:"space-between", alignItems:"baseline", marginBottom:"25px"}}>
+        <div>
+           <h1 style={{fontSize:"26px", fontWeight:"900", color:D.text}}>MLB 대시보드</h1>
+           <p style={{fontSize:"12px", color:D.textSub}}>실시간 스코어 및 리그 순위</p>
+        </div>
+        <button onClick={()=>setDark(!dark)} style={{fontSize:"24px", background:"none"}}>{dark?"☀️":"🌙"}</button>
       </header>
 
-      <div style={{marginBottom:"20px"}}>
+      <div style={{position:"relative", marginBottom:"25px"}}>
         <input 
           type="text" 
-          placeholder="팀 검색 (예: Dodgers, NL)" 
+          placeholder="팀 검색 (LAD, NYM, NL...)" 
           value={search}
           onChange={(e)=>setSearch(e.target.value)}
-          style={{width:"100%", padding:"12px", borderRadius:"12px", border:"none", background:D.inputBg, color:dark?"#fff":"#1A1A1A", fontWeight:"600", outline:"none"}}
+          style={{
+            width:"100%", padding:"16px", borderRadius:"15px", border:"none", 
+            background:D.inputBg, color: dark ? "#fff" : "#000", /* 글씨색 검정 고정 */
+            fontSize:"15px", fontWeight:"600", outline:"none"
+          }}
         />
       </div>
 
-      {tab === "today" ? (
-        filteredGames.map(g => <ScoreCard key={g.id} game={g} D={D} />)
-      ) : (
-        <div style={{color:D.text, textAlign:"center"}}>순위 데이터 준비 중...</div>
-      )}
+      {MOCK_GAMES.filter(g => g.away.name.includes(search) || g.home.name.includes(search)).map(g => (
+        <ScoreCard key={g.id} game={g} D={D} dark={dark} />
+      ))}
 
-      <nav style={{position:"fixed", bottom:0, left:0, right:0, background:D.card, padding:"15px", display:"flex", justifyContent:"space-around", borderTop:`1px solid ${D.cardBorder}`}}>
-        <button onClick={()=>setTab("today")} style={{color:tab==="today"?"#E31837":D.textSub, fontWeight:"800"}}>GAMES</button>
-        <button onClick={()=>setTab("standings")} style={{color:tab==="standings"?"#E31837":D.textSub, fontWeight:"800"}}>RANKING</button>
+      <nav style={{position:"fixed", bottom:0, left:0, right:0, background:D.card, padding:"15px 15px 30px", display:"flex", justifyContent:"space-around", borderTop:`1px solid ${D.cardBorder}`, zIndex:100}}>
+        <div style={{textAlign:"center", color:"#E31837", fontWeight:"900", fontSize:"12px"}}>📅<br/>GAMES</div>
+        <div style={{textAlign:"center", color:D.textSub, fontWeight:"900", fontSize:"12px"}}>🏆<br/>RANKING</div>
       </nav>
     </div>
   );
 }
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
 </script>
 </body>
 </html>
